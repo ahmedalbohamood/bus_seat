@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="pageTitle">Bus Seating Chart</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon">🚌</div>
+      <div>
+        <h1 data-i18n="title">Bus Seating Chart</h1>
+        <p class="subtitle" data-i18n="subtitle">Tap a seat to add a passenger</p>
+      </div>
+    </div>
+
+    <div class="stats" id="stats">
+      <div class="stat stat-left">
+        <span class="stat-num" id="statLeft">30</span>
+        <span class="stat-label" data-i18n="statLeftLabel">seats left</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num" id="statFilled">0</span>
+        <span class="stat-label" data-i18n="statFilledLabel">filled</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num" id="statFolded">0</span>
+        <span class="stat-label" data-i18n="statFoldedLabel">folded</span>
+      </div>
+      <div class="stat stat-total">
+        <span class="stat-num" id="statTotal">30</span>
+        <span class="stat-label" data-i18n="statTotalLabel">total</span>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-lang" id="langBtn" title="Switch language / تبديل اللغة">
+        <span id="langBtnLabel">العربية</span>
+      </button>
+      <button class="btn btn-ghost" id="clearAllBtn" data-i18n="clearNames" data-i18n-title="clearNamesTitle" title="Remove all passenger names">Clear names</button>
+      <button class="btn btn-primary" id="pdfBtn" data-i18n-title="pdfBtnTitle" title="Generate a printable passenger manifest">
+        <span data-i18n="generatePdf">Generate PDF</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="progress-track" id="progressTrack">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <main class="bus-wrap">
+    <div class="bus">
+      <div class="bus-front">
+        <div class="driver-seat">
+          <div class="driver-icon">🧑‍✈️</div>
+          <span data-i18n="driver">Driver</span>
+        </div>
+        <div class="door" data-i18n="doorVertical">door</div>
+      </div>
+
+      <div class="rows" id="rows"><!-- rows injected by JS --></div>
+
+      <div class="bus-rear"></div>
+    </div>
+
+    <p class="hint" data-i18n="hint">Tap a seat to name it &middot; tap again to edit &middot; use the ✕ to clear &middot; use the fold switch to remove the middle seat for extra space</p>
+  </main>
+
+  <footer class="footer">
+    <span data-i18n="footer">Your changes are saved automatically on this device.</span>
+  </footer>
+</div>
+
+<!-- Name editor popover -->
+<div class="popover-backdrop" id="popoverBackdrop">
+  <div class="popover" id="popover">
+    <label id="popoverLabel" for="nameInput">Seat</label>
+    <input type="text" id="nameInput" maxlength="24" data-i18n-placeholder="namePlaceholder" placeholder="Passenger name" autocomplete="off">
+    <div class="popover-actions">
+      <button class="btn btn-ghost" id="popoverCancel" data-i18n="cancel">Cancel</button>
+      <button class="btn btn-danger" id="popoverClear" data-i18n="remove">Remove</button>
+      <button class="btn btn-primary" id="popoverSave" data-i18n="save">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Printable manifest (only visible when printing) -->
+<div id="printSheet" class="print-sheet">
+  <h1 data-i18n="manifestTitle">Passenger Manifest</h1>
+  <div class="print-meta" id="printMeta"></div>
+  <div class="print-bus" id="printBus"></div>
+  <table class="print-table" id="printTable">
+    <thead><tr><th data-i18n="seatCol">Seat</th><th data-i18n="passengerCol">Passenger</th></tr></thead>
+    <tbody id="printTableBody"></tbody>
+  </table>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
