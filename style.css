@@ -492,5 +492,18 @@ html,body{
   .stats{ justify-content: space-between; }
   .actions{ justify-content: stretch; }
   .actions .btn{ flex:1; }
-  .seat-name{ display:none; }
+
+  /* give seats more vertical room so the full passenger name fits and wraps */
+  .seat{ aspect-ratio: auto; min-height: 62px; padding: 4px 2px; }
+  .seat-initials{ font-size: .68rem; }
+  .seat-name{
+    display: block;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    word-break: break-word;
+    max-width: 96%;
+    font-size: .52rem;
+    line-height: 1.15;
+  }
 }
