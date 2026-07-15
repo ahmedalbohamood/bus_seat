@@ -22,12 +22,15 @@
       hint: 'Tap a seat to name it · tap again to edit · use the ✕ to clear · use the fold switch to remove the middle seat for extra space',
       footer: 'Your changes are saved automatically on this device.',
       namePlaceholder: 'Passenger name',
+      nationalIdLabel: 'National ID',
+      nationalIdPlaceholder: 'National ID number',
       cancel: 'Cancel',
       remove: 'Remove',
       save: 'Save',
       manifestTitle: 'Passenger Manifest',
       seatCol: 'Seat',
-      passengerCol: 'Passenger',
+      passengerCol: 'Name',
+      nationalIdCol: 'National ID',
       seatWord: 'Seat',
       middleSuffix: ' (middle)',
       midSuffix: ' (mid)',
@@ -64,12 +67,15 @@
       hint: 'اضغط على المقعد لتسميته · اضغط مرة أخرى للتعديل · استخدم ✕ للمسح · استخدم مفتاح الطي لإزالة المقعد الأوسط لمساحة إضافية',
       footer: 'يتم حفظ تغييراتك تلقائيًا على هذا الجهاز.',
       namePlaceholder: 'اسم الراكب',
+      nationalIdLabel: 'رقم الهوية الوطنية',
+      nationalIdPlaceholder: 'رقم الهوية الوطنية',
       cancel: 'إلغاء',
       remove: 'إزالة',
       save: 'حفظ',
       manifestTitle: 'بيان الركاب',
       seatCol: 'المقعد',
-      passengerCol: 'الراكب',
+      passengerCol: 'الاسم',
+      nationalIdCol: 'رقم الهوية الوطنية',
       seatWord: 'مقعد',
       middleSuffix: ' (أوسط)',
       midSuffix: ' (أوسط)',
@@ -114,7 +120,7 @@
   }, 0); // 30
 
   /* ---------- state ---------- */
-  // seats: array of { id, row, posInRow, isMid, name, folded }
+  // seats: array of { id, row, posInRow, isMid, name, nationalId, folded }
   var seats = [];
 
   function buildDefaultSeats() {
@@ -130,6 +136,7 @@
           posInRow: seatIndexInRow,
           isMid: token === 'F',
           name: '',
+          nationalId: '',
           folded: false
         });
         n++;
@@ -175,6 +182,7 @@
   var popoverBackdrop = document.getElementById('popoverBackdrop');
   var popoverLabel = document.getElementById('popoverLabel');
   var nameInput = document.getElementById('nameInput');
+  var nationalIdInput = document.getElementById('nationalIdInput');
   var popoverSave = document.getElementById('popoverSave');
   var popoverCancel = document.getElementById('popoverCancel');
   var popoverClear = document.getElementById('popoverClear');
@@ -295,6 +303,13 @@
       nm.textContent = seat.name;
       el.appendChild(nm);
 
+      if (seat.nationalId) {
+        var idEl = document.createElement('span');
+        idEl.className = 'seat-national-id';
+        idEl.textContent = seat.nationalId;
+        el.appendChild(idEl);
+      }
+
       var clearBtn = document.createElement('button');
       clearBtn.type = 'button';
       clearBtn.className = 'seat-clear';
@@ -303,6 +318,7 @@
       clearBtn.addEventListener('click', function (e) {
         e.stopPropagation();
         seat.name = '';
+        seat.nationalId = '';
         render();
       });
       el.appendChild(clearBtn);
@@ -367,6 +383,7 @@
     activeSeatId = seatId;
     popoverLabel.textContent = seatLabel(seat) + (seat.isMid ? t('middleSuffix') : '');
     nameInput.value = seat.name || '';
+    nationalIdInput.value = seat.nationalId || '';
     popoverClear.style.display = seat.name ? 'inline-flex' : 'none';
     popoverBackdrop.classList.add('open');
     setTimeout(function () { nameInput.focus(); }, 30);
@@ -381,6 +398,7 @@
     var seat = getSeat(activeSeatId);
     if (!seat) return;
     seat.name = nameInput.value.trim();
+    seat.nationalId = nationalIdInput.value.trim();
     closePopover();
     render();
   }
@@ -389,11 +407,18 @@
   popoverCancel.addEventListener('click', closePopover);
   popoverClear.addEventListener('click', function () {
     var seat = getSeat(activeSeatId);
-    if (seat) seat.name = '';
+    if (seat) {
+      seat.name = '';
+      seat.nationalId = '';
+    }
     closePopover();
     render();
   });
   nameInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') commitPopover();
+    if (e.key === 'Escape') closePopover();
+  });
+  nationalIdInput.addEventListener('keydown', function (e) {
     if (e.key === 'Enter') commitPopover();
     if (e.key === 'Escape') closePopover();
   });
@@ -406,50 +431,18 @@
     var anyFilled = seats.some(function (s) { return s.name; });
     if (!anyFilled) return;
     if (!confirm(t('confirmClear'))) return;
-    seats.forEach(function (s) { s.name = ''; });
+    seats.forEach(function (s) { s.name = ''; s.nationalId = ''; });
     render();
   });
 
   /* ---------- print / pdf ---------- */
   function renderPrintSheet() {
-    var meta = document.getElementById('printMeta');
-    var busEl = document.getElementById('printBus');
     var tbody = document.getElementById('printTableBody');
 
-    var total = seats.length;
-    var folded = seats.filter(function (s) { return s.isMid && s.folded; }).length;
-    var filled = seats.filter(function (s) { return !s.folded && s.name; }).length;
-    var active = total - folded;
-
-    var now = new Date();
-    meta.textContent = t('generated') + ' ' + now.toLocaleDateString() + ' ' + now.toLocaleTimeString() +
-      '  ·  ' + filled + ' ' + t('filledWord') + ' / ' + active + ' ' + t('activeSeats') +
-      ' / ' + folded + ' ' + t('foldedWord') + ' / ' + total + ' ' + t('statTotalLabel');
-
-    busEl.innerHTML = '';
     var sorted = seats.slice().sort(function (a, b) { return a.row - b.row || a.posInRow - b.posInRow; });
-    var lastRow = null;
-    sorted.forEach(function (seat) {
-      if (lastRow !== null && seat.row !== lastRow) {
-        var brk = document.createElement('div');
-        brk.className = 'print-row-break';
-        busEl.appendChild(brk);
-      }
-      lastRow = seat.row;
-
-      var cell = document.createElement('div');
-      cell.className = 'print-seat' + (seat.folded ? ' folded' : (seat.name ? '' : ' empty'));
-      var b = document.createElement('b');
-      b.textContent = seat.id.replace('S', '#');
-      cell.appendChild(b);
-      var span = document.createElement('span');
-      span.textContent = seat.folded ? t('foldedWord') : (seat.name || t('emptyWord'));
-      cell.appendChild(span);
-      busEl.appendChild(cell);
-    });
+    var withNames = sorted.filter(function (s) { return s.name; });
 
     tbody.innerHTML = '';
-    var withNames = sorted.filter(function (s) { return s.name; });
     if (withNames.length === 0) {
       var tr = document.createElement('tr');
       var td = document.createElement('td');
@@ -459,14 +452,14 @@
       tbody.appendChild(tr);
     } else {
       withNames.forEach(function (seat) {
-        var tr = document.createElement('tr');
-        var tdSeat = document.createElement('td');
-        tdSeat.textContent = seatLabel(seat) + (seat.isMid ? t('midSuffix') : '');
+        var tr2 = document.createElement('tr');
+        var tdId = document.createElement('td');
+        tdId.textContent = seat.nationalId || '—';
         var tdName = document.createElement('td');
         tdName.textContent = seat.name;
-        tr.appendChild(tdSeat);
-        tr.appendChild(tdName);
-        tbody.appendChild(tr);
+        tr2.appendChild(tdId);
+        tr2.appendChild(tdName);
+        tbody.appendChild(tr2);
       });
     }
   }

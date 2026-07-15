@@ -81,6 +81,8 @@
   <div class="popover" id="popover">
     <label id="popoverLabel" for="nameInput">Seat</label>
     <input type="text" id="nameInput" maxlength="24" data-i18n-placeholder="namePlaceholder" placeholder="Passenger name" autocomplete="off">
+    <label for="nationalIdInput" class="popover-label-2" data-i18n="nationalIdLabel">National ID</label>
+    <input type="text" id="nationalIdInput" maxlength="20" inputmode="numeric" data-i18n-placeholder="nationalIdPlaceholder" placeholder="National ID number" autocomplete="off">
     <div class="popover-actions">
       <button class="btn btn-ghost" id="popoverCancel" data-i18n="cancel">Cancel</button>
       <button class="btn btn-danger" id="popoverClear" data-i18n="remove">Remove</button>
@@ -91,11 +93,9 @@
 
 <!-- Printable manifest (only visible when printing) -->
 <div id="printSheet" class="print-sheet">
-  <h1 data-i18n="manifestTitle">Passenger Manifest</h1>
-  <div class="print-meta" id="printMeta"></div>
-  <div class="print-bus" id="printBus"></div>
+  <h1 class="print-letterhead">Albohamood</h1>
   <table class="print-table" id="printTable">
-    <thead><tr><th data-i18n="seatCol">Seat</th><th data-i18n="passengerCol">Passenger</th></tr></thead>
+    <thead><tr><th data-i18n="nationalIdCol">National ID</th><th data-i18n="passengerCol">Name</th></tr></thead>
     <tbody id="printTableBody"></tbody>
   </table>
 </div>
