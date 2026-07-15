@@ -52,7 +52,7 @@
       langToggleLabel: 'العربية'
     },
     ar: {
-      title: 'حملة البهامود',
+      title: 'حملة البوحمود',
       subtitle: 'اضغط على مقعد لإضافة راكب',
       statLeftLabel: 'مقاعد متبقية',
       statFilledLabel: 'مشغولة',
