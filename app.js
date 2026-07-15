@@ -7,7 +7,7 @@
   /* ---------- translations ---------- */
   var STRINGS = {
     en: {
-      title: 'Bus Seating Chart',
+      title: 'Albohamood Campaign',
       subtitle: 'Tap a seat to add a passenger',
       statLeftLabel: 'seats left',
       statFilledLabel: 'filled',
@@ -52,7 +52,7 @@
       langToggleLabel: 'العربية'
     },
     ar: {
-      title: 'مخطط مقاعد الحافلة',
+      title: 'حملة البهامود',
       subtitle: 'اضغط على مقعد لإضافة راكب',
       statLeftLabel: 'مقاعد متبقية',
       statFilledLabel: 'مشغولة',
